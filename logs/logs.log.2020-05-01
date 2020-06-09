@@ -1,0 +1,4 @@
+2020-05-01 21:00:24,943:app.main.controller.movie:ERROR:(psycopg2.errors.UndefinedTable) relation "movie__search" does not exist
+LINE 2: FROM movie__search ORDER BY movie__search.id
+             ^
+ [SQL: 'SELECT movie__search.id AS movie__search_id, movie__search.tmdb_id AS movie__search_tmdb_id, movie__search.title AS movie__search_title, movie__search.original_title AS movie__search_original_title, movie__search.img AS movie__search_img \nFROM movie__search ORDER BY movie__search.id'] (Background on this error at: http://sqlalche.me/e/f405)
