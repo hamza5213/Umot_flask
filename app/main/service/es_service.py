@@ -13,7 +13,7 @@ def add_bulk(model_list):
         print(response)
 
     except Exception as e:
-        print('error ' + e)
+        raise e
 
 
 def search(query):
