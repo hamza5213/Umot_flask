@@ -3,7 +3,7 @@ from ..service import es_service
 
 
 def get_all():
-    movies = MovieSearch.query.order_by(MovieSearch.id).all()
+    movies = MovieSearch.query.filter(MovieSearch.release_date != '0001-01-01 BC').order_by(MovieSearch.id).all()
     return movies
 
 
