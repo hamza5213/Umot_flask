@@ -36,8 +36,44 @@ def search(query):
                         "original_title._3gram"
                     ]
                 }
-            }
-        }
+            },
+            "sort": [
+                {"release_date": {"order": "desc"}},
+                {"_score": {"order": "desc"}}
+            ]
+        },
+    )
+
+    return [movie["_source"] for movie in results['hits']['hits']]
+
+
+def search_all(query, size=1000):
+    current_config = get_current_configs()
+    search_index = current_config.SEARCH_INDEX
+    es = get_es_instance()
+    results = es.search(
+        index=search_index,
+        body={
+            "query": {
+                "multi_match": {
+                    "query": query,
+                    "type": "bool_prefix",
+                    "fields": [
+                        "title",
+                        "title._2gram",
+                        "title._3gram",
+                        "original_title",
+                        "original_title._2gram",
+                        "original_title._3gram"
+                    ]
+                }
+            },
+            "sort": [
+                {"release_date": {"order": "desc"}},
+                {"_score": {"order": "desc"}}
+            ]
+        },
+        size=size
     )
 
     return [movie["_source"] for movie in results['hits']['hits']]
