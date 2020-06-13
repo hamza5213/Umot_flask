@@ -1,3 +1,7 @@
+import json
+
+from ..model.movie_imdb_genres import MovieImdbGenres
+from ..model.movie_raw_complete import MovieRawComplete
 from ..model.movie_search import MovieSearch
 from ..model.providers import Providers
 from ..model.service_provider import ServiceProvider
@@ -7,6 +11,44 @@ from ..service import es_service
 def get_all():
     movies = MovieSearch.query.filter(MovieSearch.release_date != '0001-01-01 BC').order_by(MovieSearch.id).all()
     return movies
+
+
+def get(id, locale='US'):
+    movie_raw = MovieRawComplete.query.outerjoin(MovieImdbGenres).filter(MovieRawComplete.tmdb_id == id).first()
+
+    results = ServiceProvider.query \
+        .join(Providers) \
+        .filter(ServiceProvider.tmdb_id == (id), ServiceProvider.locale == locale).all()
+
+    providers = []
+
+    for res in results:
+        providers.append({
+            'category': res.category,
+            'img': res.img,
+            'price': res.price,
+            'quality': res.quality,
+            'url': res.url,
+            'provider_name': res.providers.name
+        })
+
+    movie = {
+        'background_img': movie_raw.backdrop_path,
+        'credits': movie_raw.credits,
+        'id': movie_raw.id,
+        'original_title': movie_raw.original_title,
+        'poster_img': movie_raw.poster_path,
+        'release_date': movie_raw.release_date,
+        'runtime': movie_raw.runtime,
+        'title': movie_raw.title,
+        'providers': providers,
+        'videos': json.loads(movie_raw.videos)["results"],
+        'synopsis': movie_raw.overview,
+        'genres': [genre.name for genre in movie_raw.movie_imdb_genres] if len(movie_raw.movie_imdb_genres) > 0 else [
+            genre["name"] for genre in json.loads(movie_raw.genres)]
+    }
+
+    return movie
 
 
 def search_movie(query):

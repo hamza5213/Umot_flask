@@ -23,7 +23,7 @@ class Search(Resource):
             args = parser.parse_args()
             query = args['query']
 
-            if query != None or '':
+            if query != None and query != '':
                 data = movie_service.search_movie(query)
                 return get_response(200, data, 'Success', True)
             else:
@@ -47,11 +47,29 @@ class SearchAll(Resource):
             args = parser.parse_args()
             query = args['query']
 
-            if query != None or '':
+            if query != None and query != '':
                 data = movie_service.search_all(query)
                 return get_response(200, data, 'Success', True)
             else:
                 return get_response(300, [], 'query is null', False)
+
+        except Exception as e:
+            _logger.error(e)
+            return get_response(300, [], str(e), False)
+
+
+@api.route('/<int:id>')
+class SearchAll(Resource):
+
+    @api.doc('Get Movie')
+    @api.marshal_with(_response)
+    def get(self, id):
+        try:
+            if id > 0:
+                movie = movie_service.get(id)
+                return get_response(200, movie, 'Success', True)
+            else:
+                return get_response(300, [], 'Invalid Id', False)
 
         except Exception as e:
             _logger.error(e)
