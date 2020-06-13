@@ -38,7 +38,7 @@ def search(query):
                 }
             },
             "sort": [
-                {"release_date": {"order": "desc"}},
+                {"vote_count": {"order": "desc"}},
                 {"_score": {"order": "desc"}}
             ]
         },
@@ -95,6 +95,7 @@ def get_actions(model_list):
             'title': model.title,
             'original_title': model.original_title,
             'release_date': model.release_date,
+            'vote_count': model.vote_count,
             'timeout': 30
         }
         actions.append(action)

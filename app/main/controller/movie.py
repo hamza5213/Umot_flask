@@ -84,7 +84,7 @@ class SyncES(Resource):
     def get(self):
         try:
 
-            # movie_service.sync_es()
+            movie_service.sync_es()
             return get_response(200, [], 'Success', True)
 
         except Exception as e:

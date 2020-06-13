@@ -1,0 +1,30 @@
+curl -X PUT 'localhost:9200/movie_search_1' -H 'Content-Type: application/json' -d '
+{
+   "settings" : {
+       "number_of_shards" : 3,
+       "number_of_replicas" : 1
+   },
+   "mappings" : {
+       "properties" : {
+           "id" : { "type" : "long" },
+           "tmdb_id": {"type": "long"},
+           "original_title": {
+             "type": "search_as_you_type",
+             "max_shingle_size": 4
+           },
+           "title": {
+             "type": "search_as_you_type",
+             "max_shingle_size": 4
+           },
+           "img": {
+             "type": "keyword"
+           },
+           "release_date": {
+            "type": "date"
+           },
+		   "vote_count": {
+      			  "type":"long"
+			}
+       }
+   }
+}'
