@@ -69,8 +69,8 @@ def search_all(query, size=1000):
                 }
             },
             "sort": [
-                {"vote_count": {"order": "desc"}},
-                {"_score": {"order": "desc"}}
+                {"_score": {"order": "desc"}},
+                {"vote_count": {"order": "desc"}}
             ]
         },
         size=size
