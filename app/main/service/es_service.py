@@ -38,8 +38,8 @@ def search(query):
                 }
             },
             "sort": [
-                {"vote_count": {"order": "desc"}},
-                {"_score": {"order": "desc"}}
+                {"_score": {"order": "desc"}},
+                {"vote_count": {"order": "desc"}}
             ]
         },
     )
