@@ -69,7 +69,7 @@ def search_all(query, size=1000):
                 }
             },
             "sort": [
-                {"release_date": {"order": "desc"}},
+                {"vote_count": {"order": "desc"}},
                 {"_score": {"order": "desc"}}
             ]
         },
