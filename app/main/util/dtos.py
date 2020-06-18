@@ -1,3 +1,5 @@
+import json
+
 from flask_restplus import Namespace, fields
 
 
@@ -19,7 +21,7 @@ class MovieDto:
 def get_response(statusCode, data, message, success):
     return {
         "statusCode": statusCode,
-        'data': data,
+        'data': json.dumps(data),
         "message": message,
         "success": success
     }

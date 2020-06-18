@@ -59,7 +59,7 @@ class SearchAll(Resource):
 
 
 @api.route('/<int:id>')
-class SearchAll(Resource):
+class GetMovie(Resource):
 
     @api.doc('Get Movie')
     @api.marshal_with(_response)

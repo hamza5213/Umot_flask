@@ -34,7 +34,7 @@ def get(id, locale='US'):
 
     movie = {
         'background_img': movie_raw.backdrop_path,
-        'credits': movie_raw.credits,
+        'credits': json.loads(movie_raw.credits),
         'id': movie_raw.id,
         'original_title': movie_raw.original_title,
         'poster_img': movie_raw.poster_path,
