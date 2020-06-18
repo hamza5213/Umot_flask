@@ -44,7 +44,9 @@ def search(query):
         },
     )
 
-    return [movie["_source"] for movie in results['hits']['hits']]
+    results = [movie["_source"] for movie in results['hits']['hits']]
+    results = sorted(results, key=lambda i: i['vote_count'], reverse=True)
+    return results
 
 
 def search_all(query, size=1000):
@@ -76,8 +78,14 @@ def search_all(query, size=1000):
         size=size
     )
 
-    return [movie["_source"] for movie in results['hits']['hits']]
+    results = [movie["_source"] for movie in results['hits']['hits']]
+    if len(results) > 20:
+        results_sorted = sorted(results[: 20], key=lambda i: i['vote_count'], reverse=True)
+        results = results_sorted + results[20:]
+    else:
+        results = sorted(results, key=lambda i: i['vote_count'], reverse=True)
 
+    return results
 
 def get_actions(model_list):
     current_config = get_current_configs()
