@@ -2,12 +2,14 @@ from elasticsearch import Elasticsearch
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 
 from .config import config_by_name
 
 es = None
 current_configs = None
 db = SQLAlchemy()
+flask_bcrypt = Bcrypt()
 
 
 
