@@ -12,10 +12,10 @@ _user_register = UserDto.user_register
 
 @api.route('/')
 class UserList(Resource):
-    @api.doc('list_of_registered_users')
+    @api.doc('list_of_registered_users', security='apikey')
     @admin_token_required
     @api.marshal_list_with(_user, envelope='data')
-    def get(self):
+    def get(current_user, self):
         """List all registered users"""
         return get_all_users()
 

@@ -35,7 +35,8 @@ class UserDto:
         'dob': fields.Date(required=True, description='user data of birth'),
         'num_of_children': fields.String(required=False, description='number of children a user has'),
         'country': fields.String(required=True, description='user country'),
-        'postcode': fields.String(required=False, description='user postcode')
+        'postcode': fields.String(required=False, description='user postcode'),
+        'dp_url': fields.String(required=False, description='user display picture url')
     })
 
     user_register = api.model('user_register', {
@@ -46,7 +47,20 @@ class UserDto:
         'dob': fields.Date(required=True, description='user data of birth'),
         'num_of_children': fields.Integer(required=False, description='number of children a user has'),
         'country': fields.String(required=True, description='user country'),
-        'postcode': fields.String(required=False, description='user postcode')
+        'postcode': fields.String(required=False, description='user postcode'),
+        'dp_url': fields.String(required=False, description='user display picture url')
+    })
+
+class UserRatingDto:
+    api = Namespace('user_rating', description='user rate and mark a movie watched')
+
+    movie_watched = api.model('movie_watched', {
+        'movie_id': fields.String(required=False, description='movie ID')
+    })
+
+    user_rating = api.model('user_rating', {
+        'movie_id': fields.String(required=False, description='movie ID'),
+        'rating': fields.Integer(required=False, description='rating given by user')
     })
 
 def get_response(statusCode, data, message, success):

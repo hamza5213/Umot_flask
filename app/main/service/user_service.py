@@ -19,7 +19,8 @@ def save_new_user(data):
             dob = data['dob'],
             num_of_children = data['num_of_children'] if "num_of_children" in data else None,
             country = data['country'],
-            postcode = data['postcode'] if "postcode" in data else None
+            postcode = data['postcode'] if "postcode" in data else None,
+            dp_url = data['dp_url'] if "dp_url" in data else None
         )
         save_changes(new_user)
         return generate_token(new_user)

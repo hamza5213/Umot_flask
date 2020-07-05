@@ -14,7 +14,7 @@ def token_required(f):
         if not token:
             return data, status
 
-        return f(*args, **kwargs)
+        return f(token, *args, **kwargs)
 
     return decorated
 
@@ -37,7 +37,7 @@ def admin_token_required(f):
             }
             return response_object, 401
 
-        return f(*args, **kwargs)
+        return f(token, *args, **kwargs)
 
     return decorated
 
@@ -59,6 +59,6 @@ def premium_token_required(f):
             }
             return response_object, 401
 
-        return f(*args, **kwargs)
+        return f(token, *args, **kwargs)
 
     return decorated

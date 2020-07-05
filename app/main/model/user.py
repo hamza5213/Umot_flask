@@ -20,6 +20,7 @@ class User(Identity):
     num_of_children = db.Column(db.Integer)
     country = db.Column(db.String(50), nullable=False)
     postcode = db.Column(db.String(50))
+    dp_url = db.Column(db.String(1000))
 
     @property
     def password(self):
