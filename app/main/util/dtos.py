@@ -4,7 +4,7 @@ from flask_restplus import Namespace, fields
 
 
 class MovieDto:
-    api = Namespace('movie', description='Search Movie')
+    api = Namespace('movie', description='Movie Related Operations')
 
     movie_response = api.model('movie_response', {
         'statusCode': fields.String(required=True, description='Status Code'),
@@ -16,6 +16,11 @@ class MovieDto:
     movie_search = api.model('movie_search', {
         'query': fields.String(required=True, description='Movie Title')
     })
+    submit_response = api.model('submit_response', {
+        'response': fields.List(required=True, description='List of question and answers', cls_or_instance=fields.Raw,
+                                min_items=1)
+    })
+
 
 class AuthDto:
     api = Namespace('auth', description='authentication related operations')
@@ -23,6 +28,7 @@ class AuthDto:
         'email': fields.String(required=True, description='The email address'),
         'password': fields.String(required=True, description='The user password '),
     })
+
 
 class UserDto:
     api = Namespace('user', description='user related operations')
@@ -62,11 +68,6 @@ class UserRatingDto:
         'movie_id': fields.String(required=False, description='movie ID'),
         'rating': fields.Integer(required=False, description='rating given by user')
     })
-    submit_response = api.model('submit_response', {
-        'response': fields.List(required=True, description='List of question and answers', cls_or_instance=fields.Raw,
-                                min_items=1)
-    })
-
 
 def get_response(statusCode, data, message, success):
     return {
