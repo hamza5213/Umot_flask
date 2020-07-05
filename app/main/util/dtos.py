@@ -17,6 +17,11 @@ class MovieDto:
         'query': fields.String(required=True, description='Movie Title')
     })
 
+    submit_response = api.model('submit_response', {
+        'response': fields.List(required=True, description='List of question and answers', cls_or_instance=fields.Raw,
+                                min_items=1)
+    })
+
 
 def get_response(statusCode, data, message, success):
     return {

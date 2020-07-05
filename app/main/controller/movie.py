@@ -2,13 +2,15 @@ from flask_restplus import Resource, reqparse
 
 from ..service import logging_service
 from ..service import movie_service
+from ..service.recommendation_service import submit_response, get_questions_list, \
+    get_recommendations
 from ..util.dtos import get_response, MovieDto
 
 _logger = logging_service.get_logger(__name__)
 api = MovieDto.api
 _movie_search = MovieDto.movie_search
 _response = MovieDto.movie_response
-
+_movie_response = MovieDto.submit_response
 
 @api.route('/search')
 class Search(Resource):
@@ -76,6 +78,50 @@ class GetMovie(Resource):
             return get_response(300, [], str(e), False)
 
 
+@api.route('/recommendation/submit_response')
+class SubmitResponse(Resource):
+
+    @api.doc('Submit questionnaire response')
+    @api.expect(_movie_response, validate=True)
+    @api.marshal_with(_response)
+    def post(self):
+
+        response = api.payload['response']
+
+        try:
+            submit_response(response, 'en')
+        except Exception as e:
+            return get_response(500, [], e, 'false')
+
+
+@api.route('/get_recommendation')
+class GetRecommendation(Resource):
+
+    @api.doc('Get Recommendation')
+    @api.marshal_with(_response)
+    def get(self):
+        try:
+            movies = get_recommendations()
+            return get_response(200, movies, 'Success', True)
+        except Exception as e:
+            _logger.error(e)
+            return get_response(500, [], str(e), False)
+
+
+@api.route('/get_question')
+class GetQuestions(Resource):
+
+    @api.doc('Get Questions')
+    @api.marshal_with(_response)
+    def get(self):
+        try:
+            questions = get_questions_list('en')
+            return get_response(200, questions, 'Success', True)
+        except Exception as e:
+            _logger.error(e)
+            return get_response(500, [], str(e), False)
+
+
 @api.route('/sync_es')
 class SyncES(Resource):
 
@@ -89,4 +135,4 @@ class SyncES(Resource):
 
         except Exception as e:
             _logger.error(e)
-            return get_response(300, [], str(e), False)
+            return get_response(500, [], str(e), False)
