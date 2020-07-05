@@ -118,7 +118,7 @@ def submit_recommendations(user_id, response, movies):
 
 def get_recommendations(user_id=1):
     recommendation = Recommendations.query.filter(Recommendations.user_id == user_id).order_by(
-        Recommendations.user_id.desc()).first()
+        Recommendations.created_on.desc()).first()
     if recommendation != None:
         return recommendation.movies
     else:
