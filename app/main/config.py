@@ -1,10 +1,14 @@
+import os
+
 class Config:
+    SECRET_KEY = os.getenv('SECRET_KEY', 'ZQoDwgqKJgLvrCui9sQ65uUrvZV1DKYzAzL')
     DEBUG = False
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:ABC123ssi@127.0.0.1:5432/umot'
+    # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:root@127.0.0.1:5432/test_db'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:ABC123umot@18.222.13.116:5432/umot'
     ELASTIC_SEARCH_HOST = 'http://127.0.0.1:9200/'
     SEARCH_INDEX = 'movie_search'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -29,3 +33,5 @@ config_by_name = dict(
     test=TestingConfig,
     prod=ProductionConfig
 )
+
+key = Config.SECRET_KEY
