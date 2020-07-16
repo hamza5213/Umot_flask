@@ -3,6 +3,7 @@ from .. import db, flask_bcrypt
 import datetime
 import jwt
 from ..config import key
+from sqlalchemy.dialects.postgresql import JSONB
 
 
 class User(Identity):
@@ -21,6 +22,8 @@ class User(Identity):
     country = db.Column(db.String(50), nullable=False)
     postcode = db.Column(db.String(50))
     dp_url = db.Column(db.String(1000))
+    platform_config = db.Column(JSONB)
+    medium_config = db.Column(JSONB)
 
     @property
     def password(self):

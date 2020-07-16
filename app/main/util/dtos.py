@@ -42,7 +42,9 @@ class UserDto:
         'num_of_children': fields.String(required=False, description='number of children a user has'),
         'country': fields.String(required=True, description='user country'),
         'postcode': fields.String(required=False, description='user postcode'),
-        'dp_url': fields.String(required=False, description='user display picture url')
+        'dp_url': fields.String(required=False, description='user display picture url'),
+        'platform_config': fields.String(required=False, description='user selected platform in json'),
+        'medium_config': fields.String(required=False, description='user selected medium in json')
     })
 
     user_register = api.model('user_register', {
@@ -54,25 +56,48 @@ class UserDto:
         'num_of_children': fields.Integer(required=False, description='number of children a user has'),
         'country': fields.String(required=True, description='user country'),
         'postcode': fields.String(required=False, description='user postcode'),
-        'dp_url': fields.String(required=False, description='user display picture url')
+        'dp_url': fields.String(required=False, description='user display picture url'),
+        'platform_config': fields.String(required=False, description='user selected platform in json'),
+        'medium_config': fields.String(required=False, description='user selected medium in json')
+    })
+
+    user_update = api.model('user_update', {
+        'gender': fields.String(required=True, description='user gender'),
+        'dob': fields.Date(required=True, description='user data of birth'),
+        'num_of_children': fields.Integer(required=False, description='number of children a user has'),
+        'country': fields.String(required=True, description='user country'),
+        'postcode': fields.String(required=False, description='user postcode'),
+        'dp_url': fields.String(required=False, description='user display picture url'),
+        'platform_config': fields.String(required=False, description='user selected platform in json'),
+        'medium_config': fields.String(required=False, description='user selected medium in json')
     })
 
 class UserRatingDto:
     api = Namespace('user_rating', description='user rate and mark a movie watched')
 
     movie_watched = api.model('movie_watched', {
-        'movie_id': fields.String(required=False, description='movie ID')
+        'movie_id': fields.Integer(required=False, description='movie ID')
+    })
+
+    watched_history = api.model('watched_history', {
+        'movie_id': fields.Integer(required=True, description='movie ID')
     })
 
     user_rating = api.model('user_rating', {
-        'movie_id': fields.String(required=False, description='movie ID'),
+        'movie_id': fields.Integer(required=False, description='movie ID'),
         'rating': fields.Integer(required=False, description='rating given by user')
+    })
+
+class WishListDto:
+    api = Namespace('wish_list', description='user add movie to wish list and get list back')
+
+    wish_list = api.model('wish_list', {
+        'movie_id': fields.Integer(required=True, description='movie ID')
     })
 
 def get_response(statusCode, data, message, success):
     return {
-        "statusCode": statusCode,
         'data': json.dumps(data),
         "message": message,
         "success": success
-    }
+    }, statusCode

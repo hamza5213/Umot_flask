@@ -52,7 +52,7 @@ def premium_token_required(f):
             return data, status
 
         user_type = token.get('user_type')
-        if user_type != "premium":
+        if user_type != "premium" and user_type != "admin":
             response_object = {
                 'status': 'fail',
                 'message': 'premium token required'
