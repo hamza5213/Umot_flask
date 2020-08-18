@@ -36,6 +36,54 @@ class Search(Resource):
             return get_response(300, [], str(e), False)
 
 
+@api.route('/actor_search')
+class Search(Resource):
+
+    @api.doc('Actor Name')
+    @api.param('name', 'Actor Name')
+    @api.marshal_with(_response)
+    def get(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('name', type=str, help='name cannot be null')
+            args = parser.parse_args()
+            query = args['name']
+
+            if query != None and query != '':
+                data = movie_service.search_actor(query)
+                return get_response(200, data, 'Success', True)
+            else:
+                return get_response(300, [], 'query is null', False)
+
+        except Exception as e:
+            _logger.error(e)
+            return get_response(300, [], str(e), False)
+
+
+@api.route('/tag_search')
+class Search(Resource):
+
+    @api.doc('Tag Title')
+    @api.param('title', 'Tag Title')
+    @api.marshal_with(_response)
+    def get(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('title', type=str, help='title cannot be null')
+            args = parser.parse_args()
+            query = args['title']
+
+            if query != None and query != '':
+                data = movie_service.search_tags(query)
+                return get_response(200, data, 'Success', True)
+            else:
+                return get_response(300, [], 'query is null', False)
+
+        except Exception as e:
+            _logger.error(e)
+            return get_response(300, [], str(e), False)
+
+
 @api.route('/search/all')
 class SearchAll(Resource):
 

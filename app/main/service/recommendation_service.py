@@ -162,10 +162,10 @@ def get_query(filter_question, locale):
                 query = query.join(AwardsCount).filter(AwardsCount.count == 0)
 
         elif ele['question'].value == FilteredQuestions.tags.value:
-            query = query.filter(MovieRawComplete.keywords_json.contains({'keywords': [{"name": ele['extra']}]}))
+            query = query.filter(MovieRawComplete.keywords_json.contains({'keywords': [{"id": ele['extra']}]}))
 
         elif ele['question'].value == FilteredQuestions.cast.value:
-            query = query.filter(MovieRawComplete.keywords_json.contains({'cast': [{"name": ele['extra']}]}))
+            query = query.filter(MovieRawComplete.keywords_json.contains({'cast': [{"id1": ele['extra']}]}))
 
         elif ele['question'].value == FilteredQuestions.recent_films.value:
             if ele['answer'].value == QuestionRecentFilms.yes.value:

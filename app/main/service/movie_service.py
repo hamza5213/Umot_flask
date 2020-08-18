@@ -3,14 +3,32 @@ import json
 from ..model.movie_imdb_genres import MovieImdbGenres
 from ..model.movie_raw_complete import MovieRawComplete
 from ..model.movie_search import MovieSearch
+from ..model.person import Person
 from ..model.providers import Providers
 from ..model.service_provider import ServiceProvider
+from ..model.tags import Tags
 from ..service import es_service
 
 
 def get_all():
     movies = MovieSearch.query.filter(MovieSearch.release_date != '0001-01-01 BC').order_by(MovieSearch.id).all()
     return movies
+
+
+def search_actor(name):
+    actors = Person.query.filter(Person.name.like('%' + name + '%')).order_by(Person.popularity.desc()).limit(20).all()
+    result = [];
+    for actor in actors:
+        result.append({'name': actor.name, 'id': actor.id})
+    return result
+
+
+def search_tags(name):
+    tags = Tags.query.filter(Tags.name.like('%' + name + '%')).limit(20).all()
+    result = [];
+    for tag in tags:
+        result.append({'name': tag.name, 'id': tag.id})
+    return result
 
 
 def get(id, locale='US'):
