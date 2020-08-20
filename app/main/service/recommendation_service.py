@@ -34,8 +34,8 @@ def get_random_ele(arr, size):
 
 def get_prepared_question_list(questions):
     group0 = questions[0]
-    group1 = get_random_ele(questions[1], 3)
-    group2 = get_random_ele(questions[2], 2)
+    group1 = get_random_ele(questions[1], 2)
+    group2 = get_random_ele(questions[2], 1)
     group3 = get_random_ele(questions[3], 1)
 
     return group0 + group1 + group2 + group3
@@ -155,6 +155,7 @@ def get_query(filter_question, locale):
             if ele['answer'].value == QuestionOV.ov.value:
                 query = query.filter(MovieRawComplete.original_language == locale)
 
+
         elif ele['question'].value == FilteredQuestions.awarded.value:
             if ele['answer'].value == QuestionAwarded.yes.value:
                 query = query.join(AwardsCount).filter(AwardsCount.count != 0)
@@ -162,10 +163,10 @@ def get_query(filter_question, locale):
                 query = query.join(AwardsCount).filter(AwardsCount.count == 0)
 
         elif ele['question'].value == FilteredQuestions.tags.value:
-            query = query.filter(MovieRawComplete.keywords_json.contains({'keywords': [{"id": ele['extra']}]}))
+            query = query.filter(MovieRawComplete.keywords_json.contains({'keywords': [{"id": int(ele['extra'])}]}))
 
         elif ele['question'].value == FilteredQuestions.cast.value:
-            query = query.filter(MovieRawComplete.keywords_json.contains({'cast': [{"id1": ele['extra']}]}))
+            query = query.filter(MovieRawComplete.credits_json.contains({'cast': [{"id": int(ele['extra'])}]}))
 
         elif ele['question'].value == FilteredQuestions.recent_films.value:
             if ele['answer'].value == QuestionRecentFilms.yes.value:
