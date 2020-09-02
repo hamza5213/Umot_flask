@@ -18,7 +18,8 @@ class MovieDto:
     })
     submit_response = api.model('submit_response', {
         'response': fields.List(required=True, description='List of question and answers', cls_or_instance=fields.Raw,
-                                min_items=1)
+                                min_items=1),
+        'locale': fields.String(required=False, description='The user locale')
     })
 
 

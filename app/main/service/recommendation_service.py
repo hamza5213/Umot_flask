@@ -2,12 +2,14 @@ import copy
 import datetime
 import json
 import random
+from datetime import datetime
 
 from app.main.model.answers import Answers
 from app.main.model.genre_scores import GenreScores
 from app.main.model.movie_raw_complete import MovieRawComplete, AwardsCount
 from app.main.model.questions import Questions
 from app.main.model.recommendations import Recommendations
+from app.main.model.user_rating import UserRating
 from app.main.service.db_operations import add_to_db
 from app.main.util.enumerations import FilteredQuestions, QuestionOV, QuestionAwarded, QuestionRecentFilms
 
@@ -28,6 +30,7 @@ def get_by_group(questions):
 
 
 def get_random_ele(arr, size):
+    random.seed(datetime.now())
     indexes = random.sample(range(0, len(arr)), size)
     return [arr[index] for index in indexes]
 
@@ -117,10 +120,14 @@ def submit_recommendations(user_id, response, movies):
 
 
 def get_recommendations(user_id=1):
+    watched = UserRating.query.filter_by(user_id=user_id).all()
+    watched_movies = [watched_movie.movie_id for watched_movie in watched]
+
     recommendation = Recommendations.query.filter(Recommendations.user_id == user_id).order_by(
         Recommendations.created_on.desc()).first()
     if recommendation != None:
-        return recommendation.movies
+        res = list(set(recommendation.movies) ^ set(watched_movies))
+        return res
     else:
         return "no record found"
 

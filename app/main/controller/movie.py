@@ -4,6 +4,7 @@ from ..service import logging_service
 from ..service import movie_service
 from ..service.recommendation_service import submit_response, get_questions_list, \
     get_recommendations
+from ..util.decorator import token_required
 from ..util.dtos import get_response, MovieDto
 
 _logger = logging_service.get_logger(__name__)
@@ -37,7 +38,7 @@ class Search(Resource):
 
 
 @api.route('/actor_search')
-class Search(Resource):
+class ActorSearch(Resource):
 
     @api.doc('Actor Name')
     @api.param('name', 'Actor Name')
@@ -61,7 +62,7 @@ class Search(Resource):
 
 
 @api.route('/tag_search')
-class Search(Resource):
+class TagSearch(Resource):
 
     @api.doc('Tag Title')
     @api.param('title', 'Tag Title')
@@ -131,15 +132,22 @@ class SubmitResponse(Resource):
 
     @api.doc('Submit questionnaire response')
     @api.expect(_movie_response, validate=True)
+    @token_required
     @api.marshal_with(_response)
-    def post(self):
+    def post(current_user, self):
 
         response = api.payload['response']
+        locale = api.payload['locale']
+
+        if locale == None:
+            locale = 'en'
 
         try:
-            submit_response(response, 'en')
+            submit_response(response, locale, current_user['user_id'])
+            return get_response(200, 'Success', 'Success', True)
         except Exception as e:
             return get_response(500, [], e, 'false')
+
 
 
 @api.route('/get_recommendation')
@@ -147,7 +155,8 @@ class GetRecommendation(Resource):
 
     @api.doc('Get Recommendation')
     @api.marshal_with(_response)
-    def get(self):
+    @token_required
+    def get(current_user, self):
         try:
             movies = get_recommendations()
             return get_response(200, movies, 'Success', True)
@@ -161,9 +170,17 @@ class GetQuestions(Resource):
 
     @api.doc('Get Questions')
     @api.marshal_with(_response)
+    @api.param('locale', 'The user locale')
     def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('locale', type=str, help='query cannot be null')
+        args = parser.parse_args()
+        locale = args['locale']
+        if locale == None:
+            locale = 'en'
+
         try:
-            questions = get_questions_list('en')
+            questions = get_questions_list(locale)
             return get_response(200, questions, 'Success', True)
         except Exception as e:
             _logger.error(e)
