@@ -130,7 +130,7 @@ class GetMovie(Resource):
 @api.route('/recommendation/submit_response')
 class SubmitResponse(Resource):
 
-    @api.doc('Submit questionnaire response')
+    @api.doc('Submit questionnaire response', security='apikey')
     @api.expect(_movie_response, validate=True)
     @token_required
     @api.marshal_with(_response)
@@ -153,7 +153,7 @@ class SubmitResponse(Resource):
 @api.route('/get_recommendation')
 class GetRecommendation(Resource):
 
-    @api.doc('Get Recommendation')
+    @api.doc('Get Recommendation', security='apikey')
     @api.marshal_with(_response)
     @token_required
     def get(current_user, self):
