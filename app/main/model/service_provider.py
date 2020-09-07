@@ -5,6 +5,7 @@ from .. import db
 class ServiceProvider(Identity):
     __tabelname__ = "service_providers"
     tmdb_id = db.Column(db.Integer, nullable=False)
+    batch_id = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String, nullable=False)
     category = db.Column(db.String, nullable=False)
     img = db.Column(db.String, nullable=False)

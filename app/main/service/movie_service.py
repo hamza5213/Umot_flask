@@ -16,7 +16,8 @@ def get_all():
 
 
 def search_actor(name):
-    actors = Person.query.filter(Person.name.like('%' + name + '%')).order_by(Person.popularity.desc()).limit(20).all()
+    actors = Person.query.filter(Person.name_lower.like('%' + name + '%')).order_by(Person.popularity.desc()).limit(
+        20).all()
     result = [];
     for actor in actors:
         result.append({'name': actor.name, 'id': actor.id})
@@ -36,7 +37,7 @@ def get(id, locale='US'):
 
     results = ServiceProvider.query \
         .join(Providers) \
-        .filter(ServiceProvider.tmdb_id == (id), ServiceProvider.locale == locale).all()
+        .filter(ServiceProvider.tmdb_id == (id), ServiceProvider.locale == locale, ServiceProvider.batch_id == 1).all()
 
     providers = []
 
@@ -78,7 +79,7 @@ def search_all(query, locale='US'):
     ids = [movie['tmdb_id'] for movie in movies]
     results = ServiceProvider.query \
         .join(Providers) \
-        .filter(ServiceProvider.tmdb_id.in_(ids), ServiceProvider.locale == locale).all()
+        .filter(ServiceProvider.tmdb_id.in_(ids), ServiceProvider.locale == locale, ServiceProvider.batch_id == 1).all()
 
     providers = {}
 

@@ -2,7 +2,6 @@ import copy
 import datetime
 import json
 import random
-from datetime import datetime
 
 from app.main.model.answers import Answers
 from app.main.model.genre_scores import GenreScores
@@ -30,7 +29,7 @@ def get_by_group(questions):
 
 
 def get_random_ele(arr, size):
-    random.seed(datetime.now())
+    random.seed(datetime.datetime.now())
     indexes = random.sample(range(0, len(arr)), size)
     return [arr[index] for index in indexes]
 
@@ -126,7 +125,8 @@ def get_recommendations(user_id=1):
     recommendation = Recommendations.query.filter(Recommendations.user_id == user_id).order_by(
         Recommendations.created_on.desc()).first()
     if recommendation != None:
-        res = list(set(recommendation.movies) ^ set(watched_movies))
+        recommendation_movies = list(map(int, recommendation.movies.split(',')))
+        res = list(set(recommendation_movies) ^ set(watched_movies))
         return res
     else:
         return "no record found"
@@ -177,9 +177,11 @@ def get_query(filter_question, locale):
 
         elif ele['question'].value == FilteredQuestions.recent_films.value:
             if ele['answer'].value == QuestionRecentFilms.yes.value:
-                query = query.order_by(MovieRawComplete.release_date_c.desc())
+                query = query.filter(MovieRawComplete.release_date_c > '2018-01-01')
+                # query = query.order_by(MovieRawComplete.release_date_c.desc())
             elif ele['answer'].value == QuestionRecentFilms.no.value:
-                query = query.order_by(MovieRawComplete.release_date_c)
+                query = query.filter(MovieRawComplete.release_date_c < '2010-01-01')
+                # query = query.order_by(MovieRawComplete.release_date_c)
     return query
 
 
@@ -187,6 +189,8 @@ def get_query(filter_question, locale):
 def get_recommendation(total_scores, filtered_movies):
     movie_scores = {}
     for movie in filtered_movies:
+        if movie == None:
+            continue
         score = 0
         if len(movie.movie_imdb_genres) > 0:
             for genre in movie.movie_imdb_genres:
@@ -199,7 +203,7 @@ def get_recommendation(total_scores, filtered_movies):
         movie_scores[movie.tmdb_id] = score
     movie_scores = {k: v for k, v in sorted(movie_scores.items(), key=lambda item: item[1], reverse=True)}
     result = list(movie_scores.keys())
-    return result if len(result) <= 50 else result[:50]
+    return result if len(result) <= 200 else result[:200]
 
 
 def test():
