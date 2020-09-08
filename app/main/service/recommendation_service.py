@@ -126,8 +126,12 @@ def get_recommendations(user_id=1):
         Recommendations.created_on.desc()).first()
     if recommendation != None and recommendation.movies != "":
         recommendation_movies = list(map(int, recommendation.movies.split(',')))
-        res = list(set(recommendation_movies) ^ set(watched_movies))
-        return res
+        # res = list(set(recommendation_movies) ^ set(watched_movies))
+        for movie in watched_movies:
+            if movie in recommendation_movies:
+                index = recommendation_movies.index(movie)
+                recommendation_movies.pop(index)
+        return recommendation_movies
     else:
         return "no record found"
 
@@ -203,7 +207,7 @@ def get_recommendation(total_scores, filtered_movies):
         movie_scores[movie.tmdb_id] = score
     movie_scores = {k: v for k, v in sorted(movie_scores.items(), key=lambda item: item[1], reverse=True)}
     result = list(movie_scores.keys())
-    return result if len(result) <= 200 else result[:200]
+    return result if len(result) <= 300 else result[:300]
 
 
 def test():

@@ -139,7 +139,7 @@ class SubmitResponse(Resource):
         response = api.payload['response']
         locale = api.payload['locale']
 
-        if locale == None:
+        if locale == 'null':
             locale = 'en'
 
         try:
