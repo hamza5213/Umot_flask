@@ -124,7 +124,7 @@ def get_recommendations(user_id=1):
 
     recommendation = Recommendations.query.filter(Recommendations.user_id == user_id).order_by(
         Recommendations.created_on.desc()).first()
-    if recommendation != None:
+    if recommendation != None and recommendation.movies != "":
         recommendation_movies = list(map(int, recommendation.movies.split(',')))
         res = list(set(recommendation_movies) ^ set(watched_movies))
         return res

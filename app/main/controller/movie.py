@@ -158,7 +158,7 @@ class GetRecommendation(Resource):
     @token_required
     def get(current_user, self):
         try:
-            movies = get_recommendations()
+            movies = get_recommendations(current_user['user_id'])
             return get_response(200, movies, 'Success', True)
         except Exception as e:
             _logger.error(e)
