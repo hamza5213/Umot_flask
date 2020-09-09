@@ -1,10 +1,10 @@
 from flask import request
 from flask_restplus import Resource
 
-from ..util.dtos import UserDto, get_response
-from ..util.decorator import admin_token_required, token_required
-from ..service.user_service import save_new_user, get_all_users, get_a_user, update_existing_user
 from ..service import logging_service
+from ..service.user_service import save_new_user, get_all_users, get_a_user, update_existing_user, make_user_premium
+from ..util.decorator import admin_token_required, token_required
+from ..util.dtos import UserDto, get_response
 
 api = UserDto.api
 _logger = logging_service.get_logger(__name__)
@@ -69,6 +69,21 @@ class UpdateUser(Resource):
             data = request.json
             data['user_id'] = current_user['user_id']
             return update_existing_user(data=data)
+        except Exception as e:
+            _logger.error(e)
+            return get_response(500, [], str(e), False)
+
+
+@api.route('/update/premium/')
+class UpdateUserPremium(Resource):
+
+    @api.doc('Update User to Pemium', security='apikey')
+    @token_required
+    def post(current_user, self):
+        """Update an existing user to premium status"""
+        try:
+            make_user_premium(current_user['user_id'])
+            return get_response(500, [], 'Success', False)
         except Exception as e:
             _logger.error(e)
             return get_response(500, [], str(e), False)

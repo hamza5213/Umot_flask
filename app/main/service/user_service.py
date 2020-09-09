@@ -1,8 +1,9 @@
-import uuid
 import datetime
+import uuid
 
 from app.main import db
 from app.main.model.user import User
+from app.main.service import db_operations
 from ..util.validators import Validator
 
 
@@ -104,3 +105,10 @@ def generate_token(user):
             'message': 'Some error occurred. Please try again.'
         }
         return response_object, 401
+
+
+def make_user_premium(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user:
+        user.user_type = 'premium'
+        db_operations.add_to_db(user)
