@@ -97,7 +97,8 @@ def generate_token(user):
         response_object = {
             'status': 'success',
             'message': 'Successfully registered.',
-            'Authorization': auth_token.decode()
+            'Authorization': auth_token.decode(),
+            'public_id': user.public_id,
         }
         return response_object, 201
     except Exception as e:
