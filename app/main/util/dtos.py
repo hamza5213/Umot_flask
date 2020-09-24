@@ -70,7 +70,8 @@ class UserDto:
         'postcode': fields.String(required=False, description='user postcode'),
         'dp_url': fields.String(required=False, description='user display picture url'),
         'platform_config': fields.String(required=False, description='user selected platform in json'),
-        'medium_config': fields.String(required=False, description='user selected medium in json')
+        'medium_config': fields.String(required=False, description='user selected medium in json'),
+        'username': fields.String(required=True, description='user username')
     })
 
 class UserRatingDto:

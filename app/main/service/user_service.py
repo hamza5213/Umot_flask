@@ -60,6 +60,7 @@ def update_existing_user(data):
     if user:
         user.gender = data['gender']
         user.dob = data['dob']
+        user.username = data['username']
         user.num_of_children = data['num_of_children'] if "num_of_children" in data else None
         user.country = data['country']
         user.postcode = data['postcode'] if "postcode" in data else None
