@@ -8,6 +8,7 @@ class FilteredQuestions(enum.Enum):
     recent_films = 4
     tags = 5
     cast = 6
+    time = 7
 
 
 class QuestionOV(enum.Enum):
@@ -23,3 +24,10 @@ class QuestionAwarded(enum.Enum):
 class QuestionRecentFilms(enum.Enum):
     yes = 1
     no = 2
+
+
+class TimeSpend(enum.Enum):
+    t_0_90 = 1,
+    t_90_120 = 2,
+    t_120_180 = 3,
+    t_180 = 4

@@ -3,7 +3,7 @@ from flask_restplus import Resource, reqparse
 from ..service import logging_service
 from ..service import movie_service
 from ..service.recommendation_service import submit_response, get_questions_list, \
-    get_recommendations
+    get_recommendations, get_platform_questions_list, submit_platform_response, get_platforms_recommendations
 from ..util.decorator import token_required
 from ..util.dtos import get_response, MovieDto
 
@@ -90,16 +90,19 @@ class SearchAll(Resource):
 
     @api.doc('Movie Title')
     @api.param('query', 'Movie Title')
+    @api.param('country', 'Country')
     @api.marshal_with(_response)
     def get(self):
         try:
             parser = reqparse.RequestParser()
             parser.add_argument('query', type=str, help='query cannot be null')
+            parser.add_argument('country', type=str, help='country cannot be null')
             args = parser.parse_args()
             query = args['query']
+            country = args['country']
 
             if query != None and query != '':
-                data = movie_service.search_all(query)
+                data = movie_service.search_all(query, country)
                 return get_response(200, data, 'Success', True)
             else:
                 return get_response(300, [], 'query is null', False)
@@ -113,11 +116,16 @@ class SearchAll(Resource):
 class GetMovie(Resource):
 
     @api.doc('Get Movie')
+    @api.param('country', 'Country')
     @api.marshal_with(_response)
     def get(self, id):
         try:
+            parser = reqparse.RequestParser()
+            parser.add_argument('country', type=str, help='country cannot be null')
+            args = parser.parse_args()
+            country = args['country']
             if id > 0:
-                movie = movie_service.get(id)
+                movie = movie_service.get(id, country)
                 return get_response(200, movie, 'Success', True)
             else:
                 return get_response(300, [], 'Invalid Id', False)
@@ -149,6 +157,42 @@ class SubmitResponse(Resource):
             return get_response(500, [], e, 'false')
 
 
+@api.route('/platform_recommendation/submit_response')
+class SubmitPlatformResponse(Resource):
+
+    @api.doc('Submit questionnaire response', security='apikey')
+    @api.expect(_movie_response, validate=True)
+    @token_required
+    @api.marshal_with(_response)
+    def post(current_user, self):
+
+        response = api.payload['response']
+        locale = api.payload['locale']
+
+        if locale == 'null':
+            locale = 'en'
+
+        try:
+            res = submit_platform_response(response, locale, current_user['user_id'])
+            return get_response(200, res, 'Success', True)
+        except Exception as e:
+            return get_response(500, [], e, 'false')
+
+
+@api.route('/get_plaform_recommendation')
+class GetPlatformRecommendation(Resource):
+
+    @api.doc('Get Recommendation', security='apikey')
+    @api.marshal_with(_response)
+    @token_required
+    def get(current_user, self):
+        try:
+            platforms = get_platforms_recommendations(current_user['user_id'])
+            return get_response(200, platforms, 'Success', True)
+        except Exception as e:
+            _logger.error(e)
+            return get_response(500, [], str(e), False)
+
 
 @api.route('/get_recommendation')
 class GetRecommendation(Resource):
@@ -160,6 +204,27 @@ class GetRecommendation(Resource):
         try:
             movies = get_recommendations(current_user['user_id'])
             return get_response(200, movies, 'Success', True)
+        except Exception as e:
+            _logger.error(e)
+            return get_response(500, [], str(e), False)
+
+
+@api.route('/get_platform_question')
+class GetPlatformQuestions(Resource):
+
+    @api.doc('Get Platform Questions')
+    @api.marshal_with(_response)
+    @api.param('locale', 'The user locale')
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('locale', type=str, help='query cannot be null')
+        args = parser.parse_args()
+        locale = args['locale']
+        if locale == None:
+            locale = 'en'
+        try:
+            questions = get_platform_questions_list(locale)
+            return get_response(200, questions, 'Success', True)
         except Exception as e:
             _logger.error(e)
             return get_response(500, [], str(e), False)

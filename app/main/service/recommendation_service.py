@@ -4,13 +4,18 @@ import json
 import random
 
 from app.main.model.answers import Answers
+from app.main.model.answers_platform import AnswersPlatform
 from app.main.model.genre_scores import GenreScores
 from app.main.model.movie_raw_complete import MovieRawComplete, AwardsCount
+from app.main.model.platform_recommendation import PlatformRecommendation
+from app.main.model.platform_scores import PlatformScores
+from app.main.model.providers import Providers
 from app.main.model.questions import Questions
+from app.main.model.questions_platform import QuestionsPlatform
 from app.main.model.recommendations import Recommendations
 from app.main.model.user_rating import UserRating
 from app.main.service.db_operations import add_to_db
-from app.main.util.enumerations import FilteredQuestions, QuestionOV, QuestionAwarded, QuestionRecentFilms
+from app.main.util.enumerations import FilteredQuestions, QuestionOV, QuestionAwarded, QuestionRecentFilms, TimeSpend
 
 
 def get_questions_list(locale):
@@ -21,6 +26,35 @@ def get_questions_list(locale):
     questions = get_prepared_question_list(questions)
     qas = get_answers_list(questions)
     return qas
+
+
+def get_platform_questions_list(locale):
+    questions = QuestionsPlatform.query.filter_by(locale=locale).all()
+
+    question_ids = [question.id for question in questions]
+    answers = AnswersPlatform.query.filter(AnswersPlatform.question_id.in_(question_ids))
+    qas = {}
+
+    for answer in answers:
+        if answer.question_id not in qas:
+            qas[answer.question_id] = [{'text': answer.text,
+                                        'value': answer.value,
+                                        'answer_id': answer.id}]
+        else:
+            qas[answer.question_id].append({'text': answer.text,
+                                            'value': answer.value,
+                                            'answer_id': answer.id})
+
+    final_list = []
+    for question in questions:
+        final_list.append({
+            'question_id': question.id,
+            'text': question.text,
+            'value': question.value,
+            'answers': qas[question.id] if question.id in qas else None
+        })
+
+    return final_list
 
 
 def get_by_group(questions):
@@ -97,6 +131,36 @@ def update_response(response):
     return response
 
 
+def submit_platform_response(response, locale, user_id):
+    answer_ids = [res['answer_id'] for res in response]
+    scores = PlatformScores.query.filter(PlatformScores.answer_id.in_(answer_ids))
+    platforms = {}
+
+    for score in scores:
+        if score.provider_id not in platforms:
+            platforms[score.provider_id] = score.value
+        platforms[score.provider_id] += score.value
+    sorted_platforms = {k: v for k, v in sorted(platforms.items(), key=lambda item: item[1], reverse=True)}
+
+    platforms_id = sorted_platforms.keys()
+
+    providers = Providers.query.filter(Providers.id.in_(platforms_id))
+
+    p_response = []
+
+    for provider in providers[:3]:
+        p_response.append({'name': provider.name, 'url': provider.url})
+
+    platform_recommendation = PlatformRecommendation()
+    platform_recommendation.platforms = json.dumps(p_response)
+    platform_recommendation.created_on = datetime.datetime.now()
+    platform_recommendation.user_id = user_id
+    platform_recommendation.question_response = json.dumps(response)
+    add_to_db(platform_recommendation)
+
+    return p_response
+
+
 def submit_response(response, locale, user_id=1):
     updated_response = update_response(copy.deepcopy(response))
     filter_question = list(filter((lambda x: x['question'].category == 'fitered'), updated_response))
@@ -116,6 +180,12 @@ def submit_recommendations(user_id, response, movies):
     recommendation.question_response = json.dumps(response)
     recommendation.created_on = datetime.datetime.now()
     add_to_db(recommendation)
+
+
+def get_platforms_recommendations(user_id=1):
+    recommendation = PlatformRecommendation.query.filter(PlatformRecommendation.user_id == user_id).order_by(
+        PlatformRecommendation.created_on.desc()).first()
+    return recommendation.platforms
 
 
 def get_recommendations(user_id=1):
@@ -172,6 +242,18 @@ def get_query(filter_question, locale):
                 query = query.join(AwardsCount).filter(AwardsCount.count != 0)
             elif ele['answer'].value == QuestionAwarded.no.value:
                 query = query.join(AwardsCount).filter(AwardsCount.count == 0)
+
+        elif ele['question'].value == FilteredQuestions.time.value:
+            if ele['answer'].value == TimeSpend.t_0_90.value:
+                query = query.filter(MovieRawComplete.runtime > 0, MovieRawComplete.runtime < 90)
+            elif ele['answer'].value == TimeSpend.t_90_120.value:
+                query = query.filter(MovieRawComplete.runtime > 90, MovieRawComplete.runtime < 120)
+            elif ele['answer'].value == TimeSpend.t_120_180.value:
+                query = query.filter(MovieRawComplete.runtime > 120, MovieRawComplete.runtime < 180)
+            elif ele['answer'].value == TimeSpend.t_180.value:
+                query = query.filter(MovieRawComplete.runtime > 180)
+
+
 
         elif ele['question'].value == FilteredQuestions.tags.value:
             query = query.filter(MovieRawComplete.keywords_json.contains({'keywords': [{"id": int(ele['extra'])}]}))

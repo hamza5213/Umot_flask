@@ -32,7 +32,7 @@ def search_tags(name):
     return result
 
 
-def get(id, locale='US'):
+def get(id, locale='ES'):
     movie_raw = MovieRawComplete.query.outerjoin(MovieImdbGenres).filter(MovieRawComplete.tmdb_id == id).first()
 
     results = ServiceProvider.query \
@@ -74,7 +74,7 @@ def search_movie(query):
     return es_service.search(query)
 
 
-def search_all(query, locale='US'):
+def search_all(query, locale='ES'):
     movies = es_service.search_all(query)
     ids = [movie['tmdb_id'] for movie in movies]
     results = ServiceProvider.query \
